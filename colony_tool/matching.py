@@ -83,12 +83,14 @@ def ransac_similarity(
             best_inliers = inliers
 
     if best_cnt >= min_inliers:
-        warped = apply_T(old_pts, best_T)
-        d2 = ((warped[:, None, :] - new_pts[None, :, :]) ** 2).sum(axis=2)
-        nn_idx = d2.argmin(axis=1)
-        src = old_pts[best_inliers]
-        dst = new_pts[nn_idx[best_inliers]]
-        best_T, _ = umeyama_similarity(src, dst)
+        best_T = refine_similarity_iterative(
+            old_pts,
+            new_pts,
+            init_T=best_T,
+            max_nn_thresh=nn_thresh,
+            min_inliers=min_inliers,
+            steps=3,
+        )
 
     return best_T, best_inliers, (0.0 if best_cnt == 0 else float(best_score))
 
@@ -107,6 +109,39 @@ def match_labels_hungarian(pred_pts: np.ndarray, new_pts: np.ndarray, max_dist: 
         if cost[ri, ci] < 1e6:
             out[ri] = int(ci)
     return out
+
+
+def refine_similarity_iterative(
+    old_pts: np.ndarray,
+    new_pts: np.ndarray,
+    init_T: np.ndarray,
+    max_nn_thresh: float,
+    min_inliers: int = 8,
+    steps: int = 3,
+) -> np.ndarray:
+    """Refine similarity transform with progressively tighter inlier threshold."""
+    T = init_T.copy()
+    if old_pts.shape[0] < 2 or new_pts.shape[0] < 2:
+        return T
+
+    for step in range(max(1, steps)):
+        thr = max_nn_thresh * (0.7 ** step)
+        warped = apply_T(old_pts, T)
+        d2 = ((warped[:, None, :] - new_pts[None, :, :]) ** 2).sum(axis=2)
+        nn_idx = d2.argmin(axis=1)
+        nn_dist = np.sqrt(d2[np.arange(d2.shape[0]), nn_idx])
+
+        # Mutual NN constraint reduces accidental pairings in dense colonies.
+        rev_idx = d2.argmin(axis=0)
+        mutual = np.array([rev_idx[j] == i for i, j in enumerate(nn_idx)], dtype=bool)
+        inliers = (nn_dist < thr) & mutual
+        if int(inliers.sum()) < min_inliers:
+            continue
+
+        src = old_pts[inliers]
+        dst = new_pts[nn_idx[inliers]]
+        T, _ = umeyama_similarity(src, dst)
+    return T
 
 
 def score_session_for_current(prev: Session, cur_dets: List[Det], ransac_iters=400, nn_thresh=18.0, max_match_dist=25.0):
