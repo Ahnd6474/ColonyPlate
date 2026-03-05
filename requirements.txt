@@ -1,6 +1,6 @@
-streamlit
-opencv-python
-numpy
-scipy
-ultralytics
 gradio
+numpy
+opencv-python
+scipy
+torch
+ultralytics
