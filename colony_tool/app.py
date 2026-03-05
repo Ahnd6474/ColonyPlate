@@ -23,16 +23,23 @@ def draw_overlay(img_bgr: np.ndarray, dets: List[Det], labels: Dict[str, str], s
     out = img_bgr.copy()
     for d in dets:
         x1, y1, x2, y2 = map(int, map(round, d.bbox_xyxy))
-        color = (0, 255, 255) if d.det_id != selected_id else (0, 255, 0)
+        is_labeled = bool(labels.get(d.det_id, "").strip())
+        if d.det_id == selected_id:
+            color = (0, 255, 0)
+        elif is_labeled:
+            color = (255, 128, 0)
+        else:
+            color = (0, 255, 255)
         cv2.rectangle(out, (x1, y1), (x2, y2), color, 2)
         cx, cy = map(int, map(round, d.centroid_xy))
         cv2.circle(out, (cx, cy), 3, (0, 0, 255), -1)
 
         label = labels.get(d.det_id, "")
-        tag = f"{d.det_id}: {label}" if label else d.det_id
-        ty = max(14, y1 - 8)
-        cv2.putText(out, tag, (x1, ty), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (0, 0, 0), 3, cv2.LINE_AA)
-        cv2.putText(out, tag, (x1, ty), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (255, 255, 255), 1, cv2.LINE_AA)
+        if label:
+            tag = f"{d.det_id}: {label}"
+            ty = max(14, y1 - 8)
+            cv2.putText(out, tag, (x1, ty), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (0, 0, 0), 3, cv2.LINE_AA)
+            cv2.putText(out, tag, (x1, ty), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (255, 255, 255), 1, cv2.LINE_AA)
     return out
 
 
