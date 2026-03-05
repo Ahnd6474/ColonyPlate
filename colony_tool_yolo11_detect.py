@@ -12,7 +12,7 @@ def main():
     from colony_tool.app import build_app
 
     demo = build_app(args.weights, args.sessions)
-    demo.launch(server_name=args.host, server_port=args.port, show_api=False)
+    demo.launch(server_name=args.host, server_port=args.port)
 
 
 if __name__ == "__main__":
