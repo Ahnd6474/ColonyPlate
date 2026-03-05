@@ -59,7 +59,7 @@ python colony_tool_yolo11_detect.py \
 - 검출이 과다/부족하면 `conf`, `iou`, `imgsz` 조정
 - 가장자리 오검출이 많으면 `원형 ROI`, `drop_ring` 활성화 유지
 - 재매핑 성능이 낮으면 `RANSAC iters`, `NN thresh`, `매칭 허용 거리`를 이미지 품질에 맞게 조절
-
+- 레이블 관련 디버깅 필요
 ## requirements 점검 메모
 - `streamlit`은 현재 코드에서 사용하지 않아 제거했습니다.
 - `ultralytics` 실행 환경 안정화를 위해 `torch`를 명시했습니다.
