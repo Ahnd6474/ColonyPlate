@@ -36,9 +36,9 @@ def draw_overlay(img_bgr: np.ndarray, dets: List[Det], labels: Dict[str, str], s
 
         label = labels.get(d.det_id, "")
         if label:
-            tag = f"{d.det_id}: {label}"
+            tag = f"{label}"
             ty = max(14, y1 - 8)
-            cv2.putText(out, tag, (x1, ty), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (0, 0, 0), 3, cv2.LINE_AA)
+            cv2.putText(out, tag, (x1, ty), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 3, cv2.LINE_AA)
             cv2.putText(out, tag, (x1, ty), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (255, 255, 255), 1, cv2.LINE_AA)
     return out
 
