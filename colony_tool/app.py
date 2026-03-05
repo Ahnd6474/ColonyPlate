@@ -28,9 +28,11 @@ def draw_overlay(img_bgr: np.ndarray, dets: List[Det], labels: Dict[str, str], s
         cx, cy = map(int, map(round, d.centroid_xy))
         cv2.circle(out, (cx, cy), 3, (0, 0, 255), -1)
 
-        tag = labels.get(d.det_id, "")
-        if tag:
-            cv2.putText(out, tag, (x1, max(0, y1 - 6)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
+        label = labels.get(d.det_id, "")
+        tag = f"{d.det_id}: {label}" if label else d.det_id
+        ty = max(14, y1 - 8)
+        cv2.putText(out, tag, (x1, ty), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (0, 0, 0), 3, cv2.LINE_AA)
+        cv2.putText(out, tag, (x1, ty), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (255, 255, 255), 1, cv2.LINE_AA)
     return out
 
 
