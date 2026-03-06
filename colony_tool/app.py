@@ -284,7 +284,7 @@ def build_app(weights: str, sessions_dir: str):
                 min_area = gr.Slider(1, 10000, value=30, step=1, label="min bbox area (px^2)")
                 max_area = gr.Slider(1000, 2_000_000, value=500_000, step=1000, label="max bbox area (px^2)")
                 use_roi = gr.Checkbox(value=True, label="원형 ROI 마스킹(권장)")
-                drop_ring = gr.Checkbox(value=True, label="가장자리 반사띠 주변 drop")
+                drop_ring = gr.Checkbox(value=False, label="가장자리 반사띠 주변 drop")
                 btn_load = gr.Button("이미지 로드 + 검출")
 
                 status = gr.Textbox(label="상태", value="")
